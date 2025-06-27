@@ -1,0 +1,30 @@
+# ninja log v6
+45	1005	7726410803702550	build.ninja	525a322bfc877f2c
+36	187	7726843037846107	Clone_autogen/mocs_compilation.cpp	7db88c38d9703e5b
+4	22	7725034486921995	CMakeFiles/clean.additional	baedbe210acaa455
+22	29	7725034487136489	clean	577b940aee94fbd7
+36	187	7726843037846107	Clone_autogen/timestamp	7db88c38d9703e5b
+36	187	7726843037846107	E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/timestamp	7db88c38d9703e5b
+36	187	7726843037846107	E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/mocs_compilation.cpp	7db88c38d9703e5b
+812	3833	7726675859918731	CMakeFiles/Clone.dir/Clone_autogen/mocs_compilation.cpp.obj	116f103b3259a6e1
+188	3961	7726843039401110	CMakeFiles/Clone.dir/mainwindow.cpp.obj	d4950a969c6165eb
+815	3732	7726675859943226	CMakeFiles/Clone.dir/main.cpp.obj	53f0f15dbc045f8d
+3961	4813	7726843077124733	Clone.exe	1123ffd3dd63c5fd
+182	497	7726410972170128	Clone_autogen/EWIEGA46WW/qrc_resources.cpp	abb5181d3cb9e2cb
+182	497	7726410972170128	E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/EWIEGA46WW/qrc_resources.cpp	abb5181d3cb9e2cb
+499	6430	7726410972327272	CMakeFiles/Clone.dir/Clone_autogen/EWIEGA46WW/qrc_resources.cpp.obj	f6b2cdb6866d5481
+827	4156	7725856056169510	CMakeFiles/Clone.dir/CustomFileSystemModel.cpp.obj	17e9844b2ee5ce43
+47	212	7726844249080373	Clone_autogen/timestamp	7db88c38d9703e5b
+47	212	7726844249080373	Clone_autogen/mocs_compilation.cpp	7db88c38d9703e5b
+47	212	7726844249080373	E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/timestamp	7db88c38d9703e5b
+47	212	7726844249080373	E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/mocs_compilation.cpp	7db88c38d9703e5b
+213	3893	7726844250747361	CMakeFiles/Clone.dir/mainwindow.cpp.obj	d4950a969c6165eb
+3893	4336	7726844287542835	Clone.exe	1123ffd3dd63c5fd
+38	878	7726853435775811	Clone_autogen/timestamp	7db88c38d9703e5b
+38	878	7726853435775811	Clone_autogen/mocs_compilation.cpp	7db88c38d9703e5b
+38	878	7726853435775811	E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/timestamp	7db88c38d9703e5b
+38	878	7726853435775811	E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/mocs_compilation.cpp	7db88c38d9703e5b
+881	4002	7726853436564038	CMakeFiles/Clone.dir/main.cpp.obj	53f0f15dbc045f8d
+879	4154	7726853436541665	CMakeFiles/Clone.dir/Clone_autogen/mocs_compilation.cpp.obj	116f103b3259a6e1
+883	5225	7726853436587166	CMakeFiles/Clone.dir/mainwindow.cpp.obj	d4950a969c6165eb
+5225	5673	7726853480006429	Clone.exe	1123ffd3dd63c5fd

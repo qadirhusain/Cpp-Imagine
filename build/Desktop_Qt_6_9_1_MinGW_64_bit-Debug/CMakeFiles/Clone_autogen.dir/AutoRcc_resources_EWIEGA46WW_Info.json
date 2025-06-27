@@ -1,0 +1,32 @@
+{
+	"BUILD_DIR" : "E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen",
+	"CMAKE_BINARY_DIR" : "E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_BINARY_DIR" : "E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug",
+	"CMAKE_CURRENT_SOURCE_DIR" : "E:/QT Project/Clone",
+	"CMAKE_SOURCE_DIR" : "E:/QT Project/Clone",
+	"CROSS_CONFIG" : false,
+	"GENERATOR" : "Ninja",
+	"INCLUDE_DIR" : "E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/Clone_autogen/include",
+	"INPUTS" : 
+	[
+		"E:/QT Project/Clone/icons/refresh-white.png",
+		"E:/QT Project/Clone/icons/output-onlinepngtools.png",
+		"E:/QT Project/Clone/icons/deafult_icon.png",
+		"E:/QT Project/Clone/icons/add-file-white.png",
+		"E:/QT Project/Clone/icons/vscode_icon_white.png",
+		"E:/QT Project/Clone/icons/collapse-white.png",
+		"E:/QT Project/Clone/icons/file explorer.png",
+		"E:/QT Project/Clone/icons/close.png"
+	],
+	"LOCK_FILE" : "E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/CMakeFiles/Clone_autogen.dir/AutoRcc_resources_EWIEGA46WW_Lock.lock",
+	"MULTI_CONFIG" : false,
+	"OPTIONS" : [ "--no-zstd", "-name", "resources" ],
+	"OUTPUT_CHECKSUM" : "EWIEGA46WW",
+	"OUTPUT_NAME" : "qrc_resources.cpp",
+	"RCC_EXECUTABLE" : "C:/Qt/6.9.1/mingw_64/bin/rcc.exe",
+	"RCC_LIST_OPTIONS" : [ "--list" ],
+	"SETTINGS_FILE" : "E:/QT Project/Clone/build/Desktop_Qt_6_9_1_MinGW_64_bit-Debug/CMakeFiles/Clone_autogen.dir/AutoRcc_resources_EWIEGA46WW_Used.txt",
+	"SOURCE" : "E:/QT Project/Clone/resources.qrc",
+	"USE_BETTER_GRAPH" : true,
+	"VERBOSITY" : 0
+}
