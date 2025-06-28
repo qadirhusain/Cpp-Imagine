@@ -45,6 +45,8 @@ if(${QT_VERSION_MAJOR} GREATER_EQUAL 6)
         resources.qrc
         CustomFileSystemModel.cpp
 
+
+
     )
 else()
     if(ANDROID)

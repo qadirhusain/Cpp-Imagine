@@ -65,6 +65,110 @@ MainWindow::MainWindow(QWidget *parent)
     topLayout->addWidget(searchBar);
     setMenuWidget(topBar);
 
+    // === WELCOME SCREEN ===
+    QWidget *welcomeScreen = new QWidget(this);
+    welcomeScreen->setStyleSheet("background-color: #1e1e1e;");
+    QVBoxLayout *welcomeLayout = new QVBoxLayout(welcomeScreen);
+    welcomeLayout->setAlignment(Qt::AlignCenter);
+    QLabel *msg = new QLabel("You have not yet opened a folder.", this);
+    msg->setStyleSheet("color: #c5c5c5; font-size: 14px;");
+    msg->setAlignment(Qt::AlignCenter);
+    openFolderButton = new QPushButton("Open Folder", this);
+    openFolderButton->setFixedSize(200, 40);
+    openFolderButton->setStyleSheet("QPushButton { background-color: #0e639c; color: white; border: none; font-size: 14px; border-radius: 3px; } QPushButton:hover { background-color: #1177bb; }");
+    welcomeLayout->addWidget(msg);
+    welcomeLayout->addSpacing(15);
+    welcomeLayout->addWidget(openFolderButton);
+
+    // === MAIN EDITOR CONTAINER ===
+    editorContainer = new QWidget(this);
+    QHBoxLayout *mainLayout = new QHBoxLayout(editorContainer);
+    mainLayout->setContentsMargins(0, 0, 0, 0);
+
+    // === LEFT SIDEBAR ===
+    QWidget *sideBar = new QWidget();
+    sideBar->setFixedWidth(50);
+    sideBar->setMinimumWidth(50);
+    sideBar->setStyleSheet("background-color: #333333;");
+    QVBoxLayout *sideBarLayout = new QVBoxLayout(sideBar);
+    sideBarLayout->setContentsMargins(10, 8, 10, 0);
+    sideBarLayout->setSpacing(10);
+
+    QPushButton *explorerBtn = new QPushButton(QIcon(":/icons/icons/file explorer.png"), "", sideBar);
+    explorerBtn->setFixedSize(40, 40);
+    explorerBtn->setIconSize(QSize(40, 40));
+    explorerBtn->setStyleSheet("QPushButton { border: none; background-color: transparent; }"
+                               "QPushButton:hover { background-color: #444444; }");
+
+    sideBarLayout->addWidget(explorerBtn);
+    sideBarLayout->addStretch();
+
+    mainLayout->addWidget(sideBar, 0);  // Sidebar, no stretch
+
+    // === FILE EXPLORER TREE VIEW ===
+    fileModel = new CustomFileSystemModel(this);
+    fileModel->setRootPath(QDir::rootPath());
+    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
+
+    treeView = new QTreeView(this);
+    treeView->setModel(fileModel);
+    treeView->hideColumn(1);
+    treeView->hideColumn(2);
+    treeView->hideColumn(3);
+    treeView->setHeaderHidden(true);
+    treeView->setStyleSheet(
+        "QTreeView { background-color: #252526; color: #d4d4d4; font: 13px 'Segoe UI'; }"
+        "QTreeView::item:selected { background-color: #094771; }"
+        "QTreeView::branch:selected { background-color: #094771; }"
+        );
+    treeView->setRootIsDecorated(true);   // Enables expand/collapse arrows
+    treeView->setAnimated(true);
+    treeView->setSortingEnabled(true);                     // ENABLE SORTING
+    treeView->sortByColumn(0, Qt::AscendingOrder);
+
+    QWidget *treeContainer = new QWidget(this);
+    this->treeContainer = treeContainer; // Add this line
+    treeContainer->setMinimumWidth(200);
+    treeContainer->setMaximumWidth(300);
+
+    QVBoxLayout *treeLayout = new QVBoxLayout(treeContainer);
+    treeLayout->setContentsMargins(0, 0, 0, 0);
+
+    // === FOLDER HEADER + TOOLBAR ===
+    QWidget *folderHeader = new QWidget(treeContainer);
+    QHBoxLayout *folderLayout = new QHBoxLayout(folderHeader);
+    folderLayout->setContentsMargins(5, 5, 5, 5);
+    folderLayout->setSpacing(10);
+
+    QLabel *folderNameLabel = new QLabel("Opened Folder", folderHeader);
+    folderNameLabel->setStyleSheet("color: #c5c5c5; font: 13px 'Segoe UI';");
+    folderLayout->addWidget(folderNameLabel);
+    folderLayout->addStretch();
+
+    QPushButton *newFileBtn = new QPushButton(QIcon(":/icons/icons/add-file-white.png"), "", folderHeader);
+    QPushButton *newFolderBtn = new QPushButton(QIcon(":/icons/icons/output-onlinepngtools.png"), "", folderHeader);
+    QPushButton *refreshBtn = new QPushButton(QIcon(":/icons/icons/refresh-white.png"), "", folderHeader);
+    QPushButton *collapseBtn = new QPushButton(QIcon(":/icons/icons/collapse-white.png"), "", folderHeader);
+
+    QList<QPushButton*> buttons = { newFileBtn, newFolderBtn, refreshBtn, collapseBtn };
+    for (auto btn : buttons) {
+        btn->setFixedSize(24, 24);
+        btn->setIconSize(QSize(16, 16));
+        btn->setStyleSheet("QPushButton { border: none; background-color: transparent; }"
+                           "QPushButton:hover { background-color: #444444; }");
+        folderLayout->addWidget(btn);
+    }
+
+    treeLayout->addWidget(folderHeader);  // 👈 Add toolbar before treeView
+    treeLayout->addWidget(treeView);
+
+    connect(newFileBtn, &QPushButton::clicked, this, &MainWindow::createNewFile);
+    connect(newFolderBtn, &QPushButton::clicked, this, &MainWindow::createNewFolder);
+    connect(refreshBtn, &QPushButton::clicked, this, &MainWindow::refreshExplorer);
+    connect(collapseBtn, &QPushButton::clicked, this, &MainWindow::collapseAllFolders);
+
+    mainLayout->addWidget(treeContainer);
+
     QMenu *fileMenu = new QMenu("File", this);
     QMenu *editMenu = new QMenu("Edit", this);
     QMenu *selectionMenu = new QMenu("Selection", this);
@@ -179,12 +283,8 @@ MainWindow::MainWindow(QWidget *parent)
     consoleOutput = new QTextBrowser(this);
     consoleOutput->setReadOnly(true);
     consoleOutput->setTextInteractionFlags(Qt::TextSelectableByMouse | Qt::TextSelectableByKeyboard);
-
-    // consoleOutput->setReadOnly(true);
     consoleOutput->setFixedHeight(150);
     consoleOutput->setStyleSheet("background-color: #1e1e1e; font: 12px 'Consolas'; border-top: 1px solid #444;");
-
-    // ✅ Add these two lines just below the style settings:
     consoleOutput->setOpenLinks(false);  // This ensures anchorClicked signal is emitted
     consoleOutput->setTextInteractionFlags(Qt::TextBrowserInteraction);
 
@@ -195,15 +295,44 @@ MainWindow::MainWindow(QWidget *parent)
         "QPushButton:hover { background-color: #444444; }"
         );
 
+    QLineEdit *consoleInput = new QLineEdit(this);
+    consoleInput->setPlaceholderText("Enter input and press Enter");
+    consoleInput->setStyleSheet("background-color: #252526; color: #d4d4d4; border: none; padding: 5px;");
+
+    QHBoxLayout *consoleTopLayout = new QHBoxLayout();
+    consoleTopLayout->addStretch();
+    consoleTopLayout->addWidget(clearConsoleBtn);
+    consoleTopLayout->setContentsMargins(5, 5, 5, 5);
+
+    QWidget *consolePanel = new QWidget(this);
+    QVBoxLayout *consolePanelLayout = new QVBoxLayout(consolePanel);
+    consolePanelLayout->setContentsMargins(0, 0, 0, 0);
+    consolePanelLayout->setSpacing(0);
+    consolePanelLayout->addLayout(consoleTopLayout);
+    consolePanelLayout->addWidget(consoleOutput);
+    consoleTopLayout->addWidget(consoleInput);
+
+    connect(clearConsoleBtn, &QPushButton::clicked, this, [=]() {
+        consoleOutput->clear();
+    });
+
+    runningProcess = nullptr;
+
+    connect(consoleInput, &QLineEdit::returnPressed, this, [=]() {
+        if (runningProcess && runningProcess->state() == QProcess::Running) {
+            QString input = consoleInput->text() + "\n";
+            runningProcess->write(input.toUtf8());
+            consoleInput->clear();
+        }
+    });
+
     toggleTerminalAction = new QAction("Toggle Terminal", this);
     toggleTerminalAction->setCheckable(true);
     toggleTerminalAction->setChecked(true);
     terminalMenu->addAction(toggleTerminalAction);
 
-    terminalMenu->addAction("Run Selected Text");
-
     connect(toggleTerminalAction, &QAction::toggled, this, [=](bool visible) {
-        consoleOutput->setVisible(visible);
+        consolePanel->setVisible(visible);
     });
 
     static bool isConsoleConnected = false;
@@ -236,112 +365,8 @@ MainWindow::MainWindow(QWidget *parent)
         isConsoleConnected = true;
     }
 
-    consoleOutput->setVisible(false);
+    consolePanel->setVisible(false);
     toggleTerminalAction->setChecked(false);
-
-    // === WELCOME SCREEN ===
-    QWidget *welcomeScreen = new QWidget(this);
-    welcomeScreen->setStyleSheet("background-color: #1e1e1e;");
-    QVBoxLayout *welcomeLayout = new QVBoxLayout(welcomeScreen);
-    welcomeLayout->setAlignment(Qt::AlignCenter);
-    QLabel *msg = new QLabel("You have not yet opened a folder.", this);
-    msg->setStyleSheet("color: #c5c5c5; font-size: 14px;");
-    msg->setAlignment(Qt::AlignCenter);
-    openFolderButton = new QPushButton("Open Folder", this);
-    openFolderButton->setFixedSize(200, 40);
-    openFolderButton->setStyleSheet("QPushButton { background-color: #0e639c; color: white; border: none; font-size: 14px; border-radius: 3px; } QPushButton:hover { background-color: #1177bb; }");
-    welcomeLayout->addWidget(msg);
-    welcomeLayout->addSpacing(15);
-    welcomeLayout->addWidget(openFolderButton);
-
-    // === MAIN EDITOR CONTAINER ===
-    editorContainer = new QWidget(this);
-    QHBoxLayout *mainLayout = new QHBoxLayout(editorContainer);
-    mainLayout->setContentsMargins(0, 0, 0, 0);
-
-    // === LEFT SIDEBAR ===
-    QWidget *sideBar = new QWidget();
-    sideBar->setFixedWidth(50);
-    sideBar->setMinimumWidth(50);
-    sideBar->setStyleSheet("background-color: #333333;");
-    QVBoxLayout *sideBarLayout = new QVBoxLayout(sideBar);
-    sideBarLayout->setContentsMargins(10, 8, 10, 0);
-    sideBarLayout->setSpacing(10);
-
-    QPushButton *explorerBtn = new QPushButton(QIcon(":/icons/icons/file explorer.png"), "", sideBar);
-    explorerBtn->setFixedSize(40, 40);
-    explorerBtn->setIconSize(QSize(40, 40));
-    explorerBtn->setStyleSheet("QPushButton { border: none; background-color: transparent; }"
-                               "QPushButton:hover { background-color: #444444; }");
-
-    sideBarLayout->addWidget(explorerBtn);
-    sideBarLayout->addStretch();
-
-    mainLayout->addWidget(sideBar, 0);  // Sidebar, no stretch
-
-    // === FILE EXPLORER TREE VIEW ===
-    fileModel = new CustomFileSystemModel(this);
-    fileModel->setRootPath(QDir::rootPath());
-    fileModel->setFilter(QDir::NoDotAndDotDot | QDir::AllDirs | QDir::Files);
-
-    treeView = new QTreeView(this);
-    treeView->setModel(fileModel);
-    treeView->hideColumn(1);
-    treeView->hideColumn(2);
-    treeView->hideColumn(3);
-    treeView->setHeaderHidden(true);
-    treeView->setStyleSheet(
-        "QTreeView { background-color: #252526; color: #d4d4d4; font: 13px 'Segoe UI'; }"
-        "QTreeView::item:selected { background-color: #094771; }"
-        "QTreeView::branch:selected { background-color: #094771; }"
-        );
-    treeView->setRootIsDecorated(true);   // Enables expand/collapse arrows
-    treeView->setAnimated(true);
-    treeView->setSortingEnabled(true);                     // ENABLE SORTING
-    treeView->sortByColumn(0, Qt::AscendingOrder);
-
-    QWidget *treeContainer = new QWidget(this);
-    this->treeContainer = treeContainer; // Add this line
-    treeContainer->setMinimumWidth(200);
-    treeContainer->setMaximumWidth(300);
-
-    QVBoxLayout *treeLayout = new QVBoxLayout(treeContainer);
-    treeLayout->setContentsMargins(0, 0, 0, 0);
-
-    // === FOLDER HEADER + TOOLBAR ===
-    QWidget *folderHeader = new QWidget(treeContainer);
-    QHBoxLayout *folderLayout = new QHBoxLayout(folderHeader);
-    folderLayout->setContentsMargins(5, 5, 5, 5);
-    folderLayout->setSpacing(10);
-
-    QLabel *folderNameLabel = new QLabel("Opened Folder", folderHeader);
-    folderNameLabel->setStyleSheet("color: #c5c5c5; font: 13px 'Segoe UI';");
-    folderLayout->addWidget(folderNameLabel);
-    folderLayout->addStretch();
-
-    QPushButton *newFileBtn = new QPushButton(QIcon(":/icons/icons/add-file-white.png"), "", folderHeader);
-    QPushButton *newFolderBtn = new QPushButton(QIcon(":/icons/icons/output-onlinepngtools.png"), "", folderHeader);
-    QPushButton *refreshBtn = new QPushButton(QIcon(":/icons/icons/refresh-white.png"), "", folderHeader);
-    QPushButton *collapseBtn = new QPushButton(QIcon(":/icons/icons/collapse-white.png"), "", folderHeader);
-
-    QList<QPushButton*> buttons = { newFileBtn, newFolderBtn, refreshBtn, collapseBtn };
-    for (auto btn : buttons) {
-        btn->setFixedSize(24, 24);
-        btn->setIconSize(QSize(16, 16));
-        btn->setStyleSheet("QPushButton { border: none; background-color: transparent; }"
-                           "QPushButton:hover { background-color: #444444; }");
-        folderLayout->addWidget(btn);
-    }
-
-    treeLayout->addWidget(folderHeader);  // 👈 Add toolbar before treeView
-    treeLayout->addWidget(treeView);
-
-    connect(newFileBtn, &QPushButton::clicked, this, &MainWindow::createNewFile);
-    connect(newFolderBtn, &QPushButton::clicked, this, &MainWindow::createNewFolder);
-    connect(refreshBtn, &QPushButton::clicked, this, &MainWindow::refreshExplorer);
-    connect(collapseBtn, &QPushButton::clicked, this, &MainWindow::collapseAllFolders);
-
-    mainLayout->addWidget(treeContainer);
 
     // === QSCI TAB EDITOR ===
     editorTabs = new QTabWidget(this);
@@ -358,19 +383,8 @@ MainWindow::MainWindow(QWidget *parent)
     QVBoxLayout *editorAndConsoleLayout = new QVBoxLayout();
     editorAndConsoleLayout->setContentsMargins(0, 0, 0, 0);
     editorAndConsoleLayout->setSpacing(0);
-
-    QHBoxLayout *consoleTopLayout = new QHBoxLayout();
-    consoleTopLayout->addStretch();              // Pushes the button to the right
-    consoleTopLayout->addWidget(clearConsoleBtn);
-    consoleTopLayout->setContentsMargins(5, 5, 5, 5);
-
-    editorAndConsoleLayout->addWidget(editorTabs, 1);  // 👈 Editor takes all space
-    editorAndConsoleLayout->addLayout(consoleTopLayout); // 👈 Add this
-    editorAndConsoleLayout->addWidget(consoleOutput);
-
-    connect(clearConsoleBtn, &QPushButton::clicked, this, [=]() {
-        consoleOutput->clear();
-    });
+    editorAndConsoleLayout->addWidget(editorTabs, 1);
+    editorAndConsoleLayout->addWidget(consolePanel);
 
     QWidget *centerEditorWidget = new QWidget(this);
     centerEditorWidget->setLayout(editorAndConsoleLayout);
@@ -494,11 +508,6 @@ MainWindow::MainWindow(QWidget *parent)
                 QString cleanName = info.fileName();
                 newEditor->setProperty("cleanName", cleanName);
 
-                // Add tab with clean name
-                /*editorTabs->addTab(newEditor, getFileIcon(cleanName), cleanName);
-                editorTabs->setTabToolTip(editorTabs->count() - 1, path);
-                editorTabs->setCurrentWidget(newEditor);*/
-
                 int index = editorTabs->addTab(newEditor, getFileIcon(cleanName), cleanName);
                 editorTabs->setTabToolTip(index, path);
                 editorTabs->setCurrentIndex(index);
@@ -528,16 +537,11 @@ MainWindow::MainWindow(QWidget *parent)
                 newEditor->setUnmatchedBraceBackgroundColor(QColor("#f44747"));
                 newEditor->setUnmatchedBraceForegroundColor(Qt::white);
 
-                connect(newEditor, SIGNAL(modificationChanged(bool)), this, SLOT(onEditorModified(bool)));
-
                 newEditor->setText(fileContent);
 
                 newEditor->setModified(false);
 
-                connect(newEditor, &QsciScintilla::modificationChanged, this, [=](bool changed) {
-                    qDebug() << "modificationChanged signal:" << changed;
-                    updateTabTitle(newEditor);
-                });
+                connect(newEditor, SIGNAL(modificationChanged(bool)), this, SLOT(onEditorModified(bool)));
             }
         }
     });
@@ -552,6 +556,14 @@ MainWindow::MainWindow(QWidget *parent)
 
 MainWindow::~MainWindow() {
     delete ui;
+}
+
+void MainWindow::handleModificationChanged(bool changed) {
+    QsciScintilla *editor = qobject_cast<QsciScintilla *>(sender());
+    if (!editor) return;
+
+    qDebug() << "modificationChanged signal:" << changed;
+    updateTabTitle(editor);
 }
 
 void MainWindow::createNewFile() {
@@ -802,12 +814,13 @@ void MainWindow::runCurrentFile() {
     outputBinary += ".exe";
 #endif
 
-    consoleOutput->clear();
     appendToConsole("[INFO] Compiling " + filePath);
 
     // Ensure console is visible when running
-    if (!consoleOutput->isVisible())
+    if (!consoleOutput->isVisible()){
+        toggleTerminalAction->setChecked(true);
         consoleOutput->setVisible(true);
+    }
 
     QProcess *compiler = new QProcess(this);
     compiler->start("g++", QStringList() << filePath << "-o" << outputBinary);
@@ -817,18 +830,28 @@ void MainWindow::runCurrentFile() {
                 if (status == QProcess::NormalExit && exitCode == 0) {
                     appendToConsole("[INFO] Compilation successful. Running program...\n");
 
-                    QProcess *runner = new QProcess(this);
-                    runner->start(outputBinary);
+                    // ✅ Store the running process
+                    if (runningProcess) {
+                        runningProcess->kill();
+                        runningProcess->deleteLater();
+                    }
 
-                    connect(runner, &QProcess::readyReadStandardOutput, [=]() {
-                        appendToConsole(runner->readAllStandardOutput());
+                    runningProcess = new QProcess(this);
+                    runningProcess->setProcessChannelMode(QProcess::MergedChannels);
+                    runningProcess->start(outputBinary);
+
+                    connect(runningProcess, &QProcess::readyReadStandardOutput, [=]() {
+                        appendToConsole(runningProcess->readAllStandardOutput());
                     });
-                    connect(runner, &QProcess::readyReadStandardError, [=]() {
-                        appendToConsole(runner->readAllStandardError());
+
+                    connect(runningProcess, &QProcess::readyReadStandardError, [=]() {
+                        appendToConsole(runningProcess->readAllStandardError());
                     });
-                    connect(runner, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=]() {
+
+                    connect(runningProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), this, [=]() {
                         appendToConsole("\n[INFO] Program finished.");
-                        runner->deleteLater();
+                        runningProcess->deleteLater();
+                        runningProcess = nullptr;
                     });
 
                 } else {
@@ -968,7 +991,6 @@ QsciScintilla* MainWindow::createEditorForContent(const QString &filePath, const
     return editor;
 }
 
-
 void MainWindow::runSelectedText() {
 
     QWidget *currentWidget = editorTabs->currentWidget();
@@ -979,8 +1001,10 @@ void MainWindow::runSelectedText() {
 
     QString selectedCode = editor->selectedText();
     if (selectedCode.trimmed().isEmpty()) {
-        if (!consoleOutput->isVisible())
+        if (!consoleOutput->isVisible()){
+            toggleTerminalAction->setChecked(true);
             consoleOutput->setVisible(true);
+        }
         appendToConsole("[WARNING] No text selected.");
         return;
     }
@@ -1007,8 +1031,10 @@ return 0;
     outputBinary += ".exe";
 #endif
 
-    if (!consoleOutput->isVisible())
+    if (!consoleOutput->isVisible()){
+        toggleTerminalAction->setChecked(true);
         consoleOutput->setVisible(true);
+    }
 
     appendToConsole("[INFO] Compiling selected snippet...");
 
@@ -1020,18 +1046,26 @@ return 0;
                 if (status == QProcess::NormalExit && exitCode == 0) {
                     appendToConsole("[INFO] Compilation successful. Running...\n");
 
-                    QProcess *runner = new QProcess(this);
-                    runner->start(outputBinary);
+                    // ✅ Prepare for user input
+                    if (runningProcess) {
+                        runningProcess->kill();
+                        runningProcess->deleteLater();
+                    }
 
-                    connect(runner, &QProcess::readyReadStandardOutput, [=]() {
-                        appendToConsole(runner->readAllStandardOutput());
+                    runningProcess = new QProcess(this);
+                    runningProcess->setProcessChannelMode(QProcess::MergedChannels);
+                    runningProcess->start(outputBinary);
+
+                    connect(runningProcess, &QProcess::readyReadStandardOutput, [=]() {
+                        appendToConsole(runningProcess->readAllStandardOutput());
                     });
-                    connect(runner, &QProcess::readyReadStandardError, [=]() {
-                        appendToConsole(runner->readAllStandardError());
+                    connect(runningProcess, &QProcess::readyReadStandardError, [=]() {
+                        appendToConsole(runningProcess->readAllStandardError());
                     });
-                    connect(runner, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=]() {
+                    connect(runningProcess, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished), [=]() {
                         appendToConsole("\n[INFO] Snippet finished.");
-                        runner->deleteLater();
+                        runningProcess->deleteLater();
+                        runningProcess = nullptr;
                     });
                 } else {
                     appendToConsole("[ERROR] Compilation failed.");

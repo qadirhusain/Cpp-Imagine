@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include "CustomFileSystemModel.h"
 #include <QTreeView>
+#include <QProcess>
 #include <QTextBrowser>
 #include <QPushButton>
 #include <QPlainTextEdit>
@@ -23,6 +24,7 @@ class MainWindow : public QMainWindow
 
 public slots:
     void onEditorModified(bool changed);
+    void handleModificationChanged(bool changed);
 
 public:
     explicit MainWindow(QWidget *parent = nullptr);
@@ -48,10 +50,10 @@ private:
     QTextBrowser *consoleOutput;
     QAction *toggleTerminalAction;
     int errorMarker = -1;
-    /*QTabWidget *terminalTabs;
-    QList<QTextBrowser *> terminalWidgets;
+    QProcess *runningProcess;
+    QTabWidget *terminalTabs;
 
-    void addNewTerminalTab(const QString &label);*/
+    void addNewTerminal();
     void autosaveFiles();
     void createNewFile();               // Slot to create a file
     void createNewFolder();            // Slot to create a folder
@@ -68,6 +70,7 @@ private:
     void runSelectedText();
     void openFileInEditor(const QString &filePath, int lineNumber);
     QsciScintilla* createEditorForContent(const QString &filePath, const QString &content);
+    QTextBrowser* getCurrentConsole();
 };
 
 #endif // MAINWINDOW_H
